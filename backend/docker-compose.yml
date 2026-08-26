@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: mineland_postgres
+    environment:
+      POSTGRES_USER: mineland
+      POSTGRES_PASSWORD: mineland123
+      POSTGRES_DB: mineland
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  timescaledb:
+    image: timescale/timescaledb:2.11.2-pg15
+    container_name: mineland_timescale
+    environment:
+      POSTGRES_USER: mineland
+      POSTGRES_PASSWORD: mineland123
+      POSTGRES_DB: iot_data
+    ports:
+      - "5433:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio:latest
+    container_name: mineland_minio
+    environment:
+      MINIO_ROOT_USER: mineland
+      MINIO_ROOT_PASSWORD: mineland123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+volumes:
+  postgres_data:
+  timescale_data:
+  minio_data:
