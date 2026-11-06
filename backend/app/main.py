@@ -1,57 +1,35 @@
+"""Active national application. Earlier fixed-site prototype is in legacy_main.py."""
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
-from app.database import pg_engine, Base
-from app.routers import satellite
+from app.national.router import router
+from app.national.store import recover_interrupted
 
-# Create tables
-Base.metadata.create_all(bind=pg_engine)
 
-app = FastAPI(
-    title="MineLand Nexus API",
-    description="AI-powered rural landscape intelligence platform",
-    version="1.0.0"
-)
+@asynccontextmanager
+async def lifespan(app):
+    recover_interrupted()
+    yield
 
-# CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-# Include routers
-app.include_router(satellite.router)
+app = FastAPI(title="MineLand Nexus — South Africa", version="5.0.0",
+    description="Evidence-led satellite land assessment for South Africa. No invented histories or sensor readings.", lifespan=lifespan)
+app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
+app.include_router(router)
 
-@app.get("/")
-async def root():
-    return {
-        "message": "MineLand Nexus API",
-        "status": "running",
-        "version": "1.0.0",
-        "endpoints": [
-            "/api/satellite/ndvi",
-            "/api/satellite/ndwi",
-            "/api/satellite/true-color",
-            "/api/satellite/available-dates",
-            "/api/satellite/solar",
-            "/api/satellite/hourly-solar",
-            "/api/satellite/mining-areas",
-            "/api/satellite/sishen-boundary",
-            "/api/satellite/combined-analysis"
-        ]
-    }
 
 @app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
+def health():
+    return {"status": "ok", "region": "South Africa", "version": "5.0.0", "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@app.get("/")
+def root():
+    return {"name": "MineLand Nexus", "region": "South Africa", "docs": "/docs", "capabilities": "/api/capabilities"}
+
 
 if __name__ == "__main__":
-    uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True
-    )
+    import uvicorn
+    uvicorn.run("app.main:app", host="127.0.0.1", port=8000)

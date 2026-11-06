@@ -24,13 +24,13 @@ class SentinelService:
         self.config = SHConfig()
         self.config.sh_client_id = os.getenv('SENTINEL_CLIENT_ID')
         self.config.sh_client_secret = os.getenv('SENTINEL_CLIENT_SECRET')
-        
+
         # Sishen/Kathu area bounds
         self.sishen_bbox = BBox(
             bbox=[27.3, -23.6, 27.7, -23.3],  # [min_lon, min_lat, max_lon, max_lat]
             crs=CRS.WGS84
         )
-        
+
     def get_ndvi(self, date: datetime) -> Dict:
         """
         Get NDVI for Sishen/Kathu area for a specific date
@@ -49,7 +49,7 @@ class SentinelService:
             return [ndvi];
         }
         """
-        
+
         request = SentinelHubRequest(
             evalscript=evalscript,
             input_data=[
@@ -66,18 +66,18 @@ class SentinelService:
             size=bbox_to_dimensions(self.sishen_bbox, 10),
             config=self.config
         )
-        
+
         try:
             data = request.get_data()[0]
             ndvi_array = data[:, :, 0]
-            
+
             # Convert to base64 for frontend display
             ndvi_normalized = ((ndvi_array + 1) * 127).astype(np.uint8)
             img = Image.fromarray(ndvi_normalized)
             buffer = io.BytesIO()
             img.save(buffer, format='PNG')
             img_base64 = base64.b64encode(buffer.getvalue()).decode()
-            
+
             return {
                 "status": "success",
                 "date": date.isoformat(),
@@ -112,7 +112,7 @@ class SentinelService:
             return [ndwi];
         }
         """
-        
+
         request = SentinelHubRequest(
             evalscript=evalscript,
             input_data=[
@@ -129,18 +129,18 @@ class SentinelService:
             size=bbox_to_dimensions(self.sishen_bbox, 10),
             config=self.config
         )
-        
+
         try:
             data = request.get_data()[0]
             ndwi_array = data[:, :, 0]
-            
+
             # Convert to base64
             ndwi_normalized = ((ndwi_array + 1) * 127).astype(np.uint8)
             img = Image.fromarray(ndwi_normalized)
             buffer = io.BytesIO()
             img.save(buffer, format='PNG')
             img_base64 = base64.b64encode(buffer.getvalue()).decode()
-            
+
             return {
                 "status": "success",
                 "date": date.isoformat(),
@@ -173,7 +173,7 @@ class SentinelService:
             return [sample.B04, sample.B03, sample.B02];
         }
         """
-        
+
         request = SentinelHubRequest(
             evalscript=evalscript,
             input_data=[
@@ -190,7 +190,7 @@ class SentinelService:
             size=bbox_to_dimensions(self.sishen_bbox, 10),
             config=self.config
         )
-        
+
         try:
             data = request.get_data()[0]
             # Normalize to 0-255 for display
@@ -199,7 +199,7 @@ class SentinelService:
             buffer = io.BytesIO()
             img.save(buffer, format='PNG')
             img_base64 = base64.b64encode(buffer.getvalue()).decode()
-            
+
             return {
                 "status": "success",
                 "date": date.isoformat(),
@@ -216,12 +216,12 @@ class SentinelService:
         Get available Sentinel-2 dates for the Sishen/Kathu area
         """
         from sentinelhub import SentinelHubCatalog, DataCollection
-        
+
         catalog = SentinelHubCatalog(config=self.config)
-        
+
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days_back)
-        
+
         search = catalog.search(
             collection=DataCollection.SENTINEL2_L2A.value,
             bbox=self.sishen_bbox,
@@ -233,12 +233,12 @@ class SentinelService:
             },
             limit=50
         )
-        
+
         dates = []
         for item in search:
             if 'datetime' in item['properties']:
                 dates.append(item['properties']['datetime'])
-        
+
         return dates
 
     def get_sishen_boundary(self) -> Dict:

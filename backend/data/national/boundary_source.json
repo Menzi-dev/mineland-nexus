@@ -1,0 +1,8 @@
+{
+  "source": "https://www.geoboundaries.org/api/current/gbOpen/ZAF/ADM0/",
+  "download": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ZAF/ADM0/geoBoundaries-ZAF-ADM0.geojson",
+  "license": "Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)",
+  "attribution": "geoBoundaries / original boundary contributors",
+  "boundary_year": "2020",
+  "note": "Simplified by 0.0002 degrees; assessment extent only, not a cadastral boundary."
+}

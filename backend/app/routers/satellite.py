@@ -21,7 +21,7 @@ async def get_ndvi(date: Optional[str] = Query(None, description="Date in YYYY-M
             raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
     else:
         dt = datetime.now() - timedelta(days=1)
-    
+
     result = sentinel_service.get_ndvi(dt)
     if result["status"] == "error":
         raise HTTPException(status_code=500, detail=result["message"])
@@ -37,7 +37,7 @@ async def get_ndwi(date: Optional[str] = Query(None, description="Date in YYYY-M
             raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
     else:
         dt = datetime.now() - timedelta(days=1)
-    
+
     result = sentinel_service.get_ndwi(dt)
     if result["status"] == "error":
         raise HTTPException(status_code=500, detail=result["message"])
@@ -53,7 +53,7 @@ async def get_true_color(date: Optional[str] = Query(None, description="Date in 
             raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
     else:
         dt = datetime.now() - timedelta(days=1)
-    
+
     result = sentinel_service.get_true_color(dt)
     if result["status"] == "error":
         raise HTTPException(status_code=500, detail=result["message"])
@@ -74,7 +74,7 @@ async def get_solar_data(lat: float = -23.45, lon: float = 27.45):
     return result
 
 @router.get("/hourly-solar")
-async def get_hourly_solar(lat: float = -23.45, lon: float = 27.45, 
+async def get_hourly_solar(lat: float = -23.45, lon: float = 27.45,
                            date: Optional[str] = Query(None, description="Date in YYYYMMDD format")):
     """Get hourly solar data"""
     result = power_service.get_hourly_solar(lat, lon, date)
@@ -101,13 +101,13 @@ async def get_combined_analysis():
     """Get combined satellite and solar analysis for Sishen"""
     # Get latest NDVI
     ndvi_result = sentinel_service.get_ndvi(datetime.now() - timedelta(days=1))
-    
+
     # Get solar data
     solar_result = power_service.get_solar_data()
-    
+
     # Get mining areas
     mining_result = mining_service.get_mining_areas()
-    
+
     # Combine results
     return {
         "status": "success",
@@ -117,3 +117,4 @@ async def get_combined_analysis():
         "mining": mining_result if mining_result["status"] == "success" else None,
         "timestamp": datetime.now().isoformat()
     }
+app.include_router(uploads.router)

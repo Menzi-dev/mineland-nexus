@@ -6,7 +6,7 @@ from app.database import Base
 
 class Site(Base):
     __tablename__ = "sites"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     description = Column(Text)
@@ -19,7 +19,7 @@ class Site(Base):
 
 class LandAnalysis(Base):
     __tablename__ = "land_analyses"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     site_id = Column(Integer, nullable=False)
     analysis_type = Column(String(50))  # suitability, risk, change
@@ -33,7 +33,7 @@ class LandAnalysis(Base):
 
 class SatelliteData(Base):
     __tablename__ = "satellite_data"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     site_id = Column(Integer, nullable=False)
     satellite_type = Column(String(20))  # SENTINEL_2, SENTINEL_1, SENTINEL_5P

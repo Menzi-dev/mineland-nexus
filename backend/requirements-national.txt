@@ -1,0 +1,10 @@
+# Active national application. Python 3.11–3.14; no paid accounts or API keys.
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
+python-multipart>=0.0.18,<1
+requests>=2.32,<3
+numpy>=2.1,<3
+rasterio>=1.4.3,<2
+pillow>=11,<13
+shapely>=2.1,<3
+pyproj>=3.7,<4
